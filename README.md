@@ -1,7 +1,6 @@
 # AI Trip Planner
 
-An interactive Streamlit app that generates **Top Attractions** and **Top Hiking Trails** for your chosen destination.  
-It mirrors the same add-ons and sidebar features as your AI Text-to-Slide project — with **provider switch (OpenAI / Offline), model picker, brand color theme, creativity control, and token limits**.
+An interactive Streamlit app that generates **Top Attractions** and **Top Hiking Trails** for your chosen destination.
 
 ---
 
