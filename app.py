@@ -29,7 +29,7 @@ import streamlit as st
 # Raw URL of your budget.py in the shared repo (override via env if needed)
 BUDGET_URL = os.getenv(
     "BUDGET_URL",
-    "https://raw.githubusercontent.com/RahulBhattacharya1/shared_config/main/shared_config/budget.py",
+    "https://raw.githubusercontent.com/RahulBhattacharya1/shared_config/main/budget.py",
 )
 
 # Safe defaults if the fetch fails
@@ -306,10 +306,9 @@ with st.sidebar:
     st.subheader("Generator")
     provider = st.selectbox("Provider", ["OpenAI", "Offline (rule-based)"])
     model = st.selectbox("Model (OpenAI)", ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini"])
-    brand = st.color_picker("Brand color", value="#0F62FE")
+    brand = "#0F62FE"
     temp = st.slider("Creativity (OpenAI)", 0.0, 1.0, 0.4, 0.05)
     max_tokens = st.slider("Max tokens (OpenAI)", 256, 4096, 1200, 32)
-    st.caption("Tip: Use Offline to demo your engineering logic without any API.")
 
     # Usage panel (rate limits)
     init_rate_limit_state()
@@ -449,28 +448,7 @@ if "results" in st.session_state:
                 ]
                 section_card(title, subtitle_html=subtitle, links=links)
 
-    with st.expander("Copy as Markdown"):
-        md = []
-        md.append("## Top Attractions")
-        for a in attractions:
-            md.append(f"- {a}")
-        md.append("\n## Top Hiking Trails")
-        for h in hikes:
-            md.append(f"- {h.name} — {h.difficulty} · {h.distance} · {h.type}")
-        st.code("\n".join(md), language="markdown")
 else:
     st.info("Enter a destination and click Generate Plan.")
 
-# Footer usage panel (mirrors your sample)
-init_rate_limit_state()
-ss = st.session_state
-st.markdown("**Usage limits**")
-st.write(f"Today: {ss['rl_calls_today']} / {DAILY_LIMIT} generations")
-if HOURLY_SHARED_CAP > 0:
-    counters = _shared_hourly_counters()
-    used = counters.get(_hour_bucket(), 0)
-    st.write(f"Hour capacity: {used} / {HOURLY_SHARED_CAP}")
-remaining = int(max(0, ss["rl_last_ts"] + COOLDOWN_SECONDS - time.time()))
-if remaining > 0:
-    st.progress(min(1.0, (COOLDOWN_SECONDS - remaining) / COOLDOWN_SECONDS))
-    st.caption(f"Cooldown: {remaining}s")
+
