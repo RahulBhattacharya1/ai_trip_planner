@@ -314,11 +314,11 @@ with st.sidebar:
     init_rate_limit_state()
     ss = st.session_state
     st.markdown("**Usage limits**")
-    st.write(f"Today: {ss['rl_calls_today']} / {DAILY_LIMIT} generations")
+    st.write(f"<span style='font-size:0.9rem'>Today: {ss['rl_calls_today']} / {DAILY_LIMIT} generations</span>")
     if HOURLY_SHARED_CAP > 0:
         counters = _shared_hourly_counters()
         used = counters.get(_hour_bucket(), 0)
-        st.write(f"Hour capacity: {used} / {HOURLY_SHARED_CAP}")
+        st.write(f"<span style='font-size:0.9rem'>Hour capacity: {used} / {HOURLY_SHARED_CAP}</span>")
     remaining = int(max(0, ss["rl_last_ts"] + COOLDOWN_SECONDS - time.time()))
     if remaining > 0:
         st.progress(min(1.0, (COOLDOWN_SECONDS - remaining) / COOLDOWN_SECONDS))
