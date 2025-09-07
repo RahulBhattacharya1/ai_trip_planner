@@ -108,30 +108,35 @@ def init_rate_limit_state():
         ss["rl_calls_today"] = 0
 
 def can_call_now():
-    """Returns (allowed: bool, reason: str, seconds_left: int)"""
     init_rate_limit_state()
     ss = st.session_state
     now = time.time()
 
-    # Cooldown check
+    # Cooldown guard
     remaining = int(max(0, ss["rl_last_ts"] + COOLDOWN_SECONDS - now))
     if remaining > 0:
         return (False, f"Please wait {remaining}s before the next generation.", remaining)
 
-    # Daily session cap
+    # === NEW: Daily budget guardrail ===
+    # Uses shared values loaded at runtime: DAILY_BUDGET and EST_COST_PER_GEN
+    est_spend = ss["rl_calls_today"] * EST_COST_PER_GEN
+    if est_spend >= DAILY_BUDGET:
+        return (False, f"Daily cost limit reached (${DAILY_BUDGET:.2f}). Try again tomorrow.", 0)
+
+    # Per-session daily cap (still keeps your old guard)
     if ss["rl_calls_today"] >= DAILY_LIMIT:
         return (False, f"Daily limit reached ({DAILY_LIMIT} generations). Try again tomorrow.", 0)
 
-    # Shared hourly cap (optional)
+    # Optional shared hourly cap
     if HOURLY_SHARED_CAP > 0:
         bucket = _hour_bucket()
         counters = _shared_hourly_counters()
         used = counters.get(bucket, 0)
         if used >= HOURLY_SHARED_CAP:
-            return (False, "Hourly capacity reached for this app. Please try in a little while.", 0)
+            return (False, "Hourly capacity reached. Please try later.", 0)
 
     return (True, "", 0)
-
+    
 def record_successful_call():
     ss = st.session_state
     ss["rl_last_ts"] = time.time()
@@ -319,6 +324,11 @@ with st.sidebar:
     if remaining > 0:
         st.progress(min(1.0, (COOLDOWN_SECONDS - remaining) / COOLDOWN_SECONDS))
         st.caption(f"Cooldown: {remaining}s")
+    est_spend = ss['rl_calls_today'] * EST_COST_PER_GEN
+    st.markdown(
+        f"<span style='font-size:0.9rem'>Budget: &#36;{est_spend:.2f} / &#36;{DAILY_BUDGET:.2f} (cfg {CONFIG_VERSION})</span>",
+        unsafe_allow_html=True
+    )
 
 colA, colB = st.columns([1.3, 1])
 with colA:
