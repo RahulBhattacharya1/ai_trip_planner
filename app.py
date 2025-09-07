@@ -325,9 +325,17 @@ with st.sidebar:
         st.caption(f"Cooldown: {remaining}s")
     est_spend = ss['rl_calls_today'] * EST_COST_PER_GEN
     st.markdown(
-        f"<span style='font-size:0.9rem'>Budget: &#36;{est_spend:.2f} / &#36;{DAILY_BUDGET:.2f} (cfg {CONFIG_VERSION})</span>",
+        f"<span style='font-size:0.9rem'>Budget: &#36;{est_spend:.2f} / &#36;{DAILY_BUDGET:.2f}</span><br/>",
         unsafe_allow_html=True
     )
+    st.markdown(
+        f"<span style='font-size:0.8rem; opacity:0.8'>Version: {CONFIG_VERSION}</span>",
+        unsafe_allow_html=True
+    )
+    
+    # Optional: show a warning if we’re on fallback defaults (remote fetch failed)
+    if CONFIG_VERSION == "fallback-local":
+        st.warning("Using fallback defaults — couldn’t fetch remote budget.py")
 
 colA, colB = st.columns([1.3, 1])
 with colA:
